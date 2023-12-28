@@ -8,12 +8,13 @@ Bienvenido al repositorio de "El Impostor", un juego de misterio y estrategia.
 
 ## Contenido del Repositorio
 
+- `src`: Contiene el código fuente del juego.
 - `public`: Archivos estáticos, como HTML y CSS.
-- `json`: Archivos JSON para del proyecto.
+- `json`: Archivos JSON para almacenar datos del juego.
 
 ## Instalación
 
-1. Clona este repositorio: `git clone https://github.com/tu-usuario/el-impostor.git`
+1. Clona este repositorio: `git clone https://github.com/porronxo92/ElImpostor.git`
 2. Instala las dependencias: `npm install`
 3. Inicia el servidor: `npm start`
 
