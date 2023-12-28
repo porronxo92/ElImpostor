@@ -6,7 +6,7 @@ const socketIO = require("socket.io"); // modulo para importar sockets
 
 const app = express();
 const server = http.createServer(app);
-const port = 3000; // Puedes cambiar el puerto según tu preferencia
+const port = process.env.PORT || 3000; // Puedes cambiar el puerto según tu preferencia
 const io = socketIO(server);
 
 app.use(express.json());
