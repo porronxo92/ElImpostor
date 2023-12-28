@@ -83,7 +83,7 @@ async function agregarTematica(id) {
     if (nuevaTematica !== "") {
       // Cargar el archivo JSON local
       // Realizar la solicitud POST con los parámetros
-      fetch(`http://${tuIpLocal}:3000/RegistroTematica`, {
+      fetch(`/RegistroTematica`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +122,7 @@ function generarPartida() {
   const qrelement = document.getElementById("codigoQR");
   const idPartida = Date.now();
   // Realizar la solicitud POST con los parámetros
-  fetch(`http://${tuIpLocal}:3000/RegistroPartida`, {
+  fetch(`/RegistroPartida`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -139,7 +139,7 @@ function generarPartida() {
     .then((data) => {
       console.log(data);
       // Crear la URL con los parámetros
-      const url = `http://${tuIpLocal}:3000/index.html?id=${idPartida}`;
+      const url = `${window.location.origin}/index.html?id=${idPartida}`;
       console.log(url);
       // Crear el código QR
       const qr = new QRious({

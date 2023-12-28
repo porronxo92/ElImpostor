@@ -40,6 +40,41 @@
           "socketId": "UOC4OJZVeFBqSkgZAAAJ"
         }
       ]
+    },
+    {
+      "id": 1703769092555,
+      "jugadores": "3",
+      "impostores": "1",
+      "tematica": "Comida",
+      "jugadoresConectados": []
+    },
+    {
+      "id": 1703769121679,
+      "jugadores": "3",
+      "impostores": "1",
+      "tematica": "Cine",
+      "jugadoresConectados": []
+    },
+    {
+      "id": 1703769163765,
+      "jugadores": "3",
+      "impostores": "1",
+      "tematica": "Cine",
+      "jugadoresConectados": []
+    },
+    {
+      "id": 1703769382666,
+      "jugadores": "3",
+      "impostores": "1",
+      "tematica": "Cine",
+      "jugadoresConectados": []
+    },
+    {
+      "id": 1703769497669,
+      "jugadores": "4",
+      "impostores": "2",
+      "tematica": "Cine",
+      "jugadoresConectados": []
     }
   ]
 }
