@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administracion Impostor</title>
+    <link rel="stylesheet" type="text/css" href="css/estilos.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="contenedor">
+      <div class="context">
+        <h2 class="centrar-texto">Panel Administrador</h2>
+        <div class="game">
+          <div class="game--feature">
+            <h4>Jugadores</h4>
+            <div class="contador">
+              <button class="game--boton" onclick="decrementarContadorJugador()">-</button>
+              <p id="contJugador" class="contador">0</p>
+              <button class="game--boton" onclick="incrementarContadorJugador()">+</button>
+            </div>
+          </div>
+
+          <div class="game--feature">
+            <h4>Impostores</h4>
+            <div class="contador">
+              <button class="game--boton" onclick="decrementarContadorImpostor()">-</button>
+              <p id="contImpostor" class="contador">0</p>
+              <button class="game--boton" onclick="incrementarContadorImpostor()">+</button>
+            </div>
+          </div>
+
+          <div class="game--feature">
+            <h4>Temáticas</h4>
+            <div class="tematica">
+              <div class="tematica--listado">
+                <h5>Listado</h5>
+                <select 
+                  id="listado_tematica"
+                ></select>
+              </div>
+              <div class="tematica--add">
+                <input
+                  class="tematica--texto"
+                  type="text"
+                  id="nuevaTematica"
+                  placeholder="Añadir temática a la lista"
+                  required="true"
+                />
+                <button class="game--boton" onclick="agregarTematicaBoton()">Añadir</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="partida">
+          <button class="game--boton" onclick="generarPartida()">Generar Partida</button>
+        </div>
+      </div>
+    </div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="cerrar" onclick="cerrarModal()">X</span>
+            <canvas id="codigoQR"></canvas>
+            <a id="partida_nueva">Ir a la partida</a>
+        </div>
+    </div>    
+  </body>
+  <script src="js/admin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>El Impostor</title>
+    <link rel="stylesheet" type="text/css" href="css/signup_style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Spinner container -->
+    <div class="contenedor">
+      <div class="context">
+        <div class="main">
+          
+          <h2 class="centrar-texto">EL IMPOSTOR</h2>
+          <div class="formulario">
+            <input
+              id="jugador"
+              class="campo campo--texto"
+              type="text"
+              name="txt"
+              placeholder="Nombre"
+              required="true"
+            />
+            <button id="JoinButton" class="campo campo--submit">
+              Unirse al juego
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="cerrar" onclick="cerrarModal()">X</span>
+        <p id="textomodal" class="texto"></p>
+        <div id="spinner" class="spinner"></div>
+      </div>
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
+  <script src="js/script.js"></script>
+</html>

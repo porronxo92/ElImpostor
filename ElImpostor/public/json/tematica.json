@@ -1,0 +1,60 @@
+{
+  "tematicas": [
+    {
+      "id": 1,
+      "tematica": "Países"
+    },
+    {
+      "id": 2,
+      "tematica": "Animales"
+    },
+    {
+      "id": 3,
+      "tematica": "Cine"
+    },
+    {
+      "id": 4,
+      "tematica": "Deportes"
+    },
+    {
+      "id": 5,
+      "tematica": "Comida"
+    },
+    {
+      "id": 6,
+      "tematica": "Ciencia"
+    },
+    {
+      "id": 7,
+      "tematica": "Historia"
+    },
+    {
+      "id": 8,
+      "tematica": "Toledo"
+    },
+    {
+      "id": 9,
+      "tematica": "Madrid"
+    },
+    {
+      "id": 10,
+      "tematica": "Cosas de casa"
+    },
+    {
+      "id": 11,
+      "tematica": "Ordenador"
+    },
+    {
+      "id": 12,
+      "tematica": "Informatica"
+    },
+    {
+      "id": 13,
+      "tematica": "Frutas"
+    },
+    {
+      "id": 14,
+      "tematica": "Todo"
+    }
+  ]
+}
