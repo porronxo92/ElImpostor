@@ -1,14 +1,9 @@
 const { Pool } = require("pg");
 const fs = require("fs");
-
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  "postgres://fl0user:zJDpgCK1f0vI@ep-purple-frog-36487470.eu-central-1.aws.neon.fl0.io:5432/impostor-db?sslmode=require";
-
+const DATABASE_URL_LOCAL = 'postgres://user_root:ruben.2409@localhost:5432/impostor_db_local';
 const DATABASE_ELEPHANTSQL = 'postgres://tcexqjal:GvdOPSNNW5BY1MD_PQ-e2-U0tXk3gZPb@mel.db.elephantsql.com/tcexqjal';
 
-const DATABASE_URL_LOCAL = 'postgres://user_root:ruben.2409@localhost:5432/impostor_db_local';
-
+const DATABASE_URL = process.env.DATABASE_URL || DATABASE_URL_LOCAL
 
 const pool = new Pool({
   connectionString: DATABASE_URL_LOCAL,
