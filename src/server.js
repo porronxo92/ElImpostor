@@ -3,6 +3,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path"); // Módulo para trabajar con rutas de archivos
 const socketIO = require("socket.io"); // modulo para importar sockets
+const bbdd = require("./db/bbdd");
 
 const app = express();
 const server = http.createServer(app);
@@ -14,43 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configuración para servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, "public")));
-
-// Ruta para registrar partidas
-app.post("/RegistroPartida", (req, res) => {
-  const { id, jugadores, impostores, tematica, jugadoresConectados } = req.body;
-
-  // Leer el archivo JSON actual
-  const jsonData = fs.readFileSync(
-    path.join(__dirname, "public", "json/partidas.json"),
-    "utf-8"
-  );
-  const partidas = JSON.parse(jsonData);
-
-  // Generar un ID único para la nueva partida
-  const nuevaPartida = {
-    id: id, // Usando la marca de tiempo como ID (puedes usar un método más robusto en producción)
-    jugadores: jugadores,
-    impostores: impostores,
-    tematica: tematica,
-    jugadoresConectados: [],
-  };
-
-  // Agregar la nueva partida al arreglo
-  partidas.partidas.push(nuevaPartida);
-
-  // Escribir el arreglo actualizado de partidas de vuelta al archivo JSON
-  fs.writeFileSync(
-    path.join(__dirname, "public", "json/partidas.json"),
-    JSON.stringify(partidas, null, 2)
-  );
-
-  // Enviar una respuesta al cliente
-  res.json({
-    success: true,
-    mensaje: "Partida registrada exitosamente",
-    partida: nuevaPartida,
-  });
-});
 
 // Ruta para registrar tematicas
 app.post("/RegistroTematica", (req, res) => {
@@ -85,72 +49,272 @@ app.post("/RegistroTematica", (req, res) => {
     tematica: nuevaTematica,
   });
 });
+// Ruta para registrar partidas
+app.post("/RegistroPartida", (req, res) => {
+  const { id, jugadores, impostores, tematica } = req.body;
+
+  // Leer el archivo JSON actual
+  const jsonData = fs.readFileSync(
+    path.join(__dirname, "public", "json/partidas.json"),
+    "utf-8"
+    );
+    const partidas = JSON.parse(jsonData);
+    
+    // Generar un ID único para la nueva partida
+    const nuevaPartida = {
+      id: id, // Usando la marca de tiempo como ID (puedes usar un método más robusto en producción)
+      jugadores: jugadores,
+      impostores: impostores,
+      tematica: tematica,
+      jugadoresConectados: [],
+    };
+    
+  // Agregar la nueva partida al arreglo
+  partidas.partidas.push(nuevaPartida);
+
+  // Escribir el arreglo actualizado de partidas de vuelta al archivo JSON
+  fs.writeFileSync(
+    path.join(__dirname, "public", "json/partidas.json"),
+    JSON.stringify(partidas, null, 2)
+  );
+
+  // Enviar una respuesta al cliente
+  res.json({
+    success: true,
+    mensaje: "Partida registrada exitosamente",
+    partida: nuevaPartida,
+  });
+});
+
+// Ruta para registrar partidas en BBDD
+app.post("/RegistroPartidaBBDD", (req, res) => {
+  const nuevaPartida = req.body;
+  bbdd
+    .insertarPartida(nuevaPartida)
+    .then((rowCount) => {
+      console.log(`${rowCount} fila(s) insertada(s)`);
+      console.log(`${nuevaPartida} registrada correctamente en la BBDD`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: "Partida registrada exitosamente",
+        partida: nuevaPartida,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al insertar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para registrar partidas en BBDD
+app.post("/RegistroTematicaBBDD", (req, res) => {
+  const nuevaTematica = req.body;
+  bbdd
+    .insertarTematica(nuevaTematica)
+    .then((rowCount) => {
+      console.log(`${rowCount} fila(s) insertada(s)`);
+      console.log(`${nuevaTematica} registrada correctamente en la BBDD`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: "Tematica registrada exitosamente",
+        tematica: nuevaTematica,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al insertar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para registrar partidas en BBDD
+app.post("/RegistroJugador", (req, res) => {
+  const nuevoJugador = req.body.jugador;
+  bbdd
+    .insertarJugadorPartida(nuevoJugador)
+    .then((rowCount) => {
+      console.log(`${rowCount} fila(s) insertada(s)`);
+      console.log(`${JSON.stringify({nuevoJugador})} registrado correctamente en la BBDD`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: "Jugador registrado exitosamente",
+        jugador: nuevoJugador,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al insertar partida:", error);
+      res.json({error});
+    });
+});
+
+// Ruta para obtener partidas en BBDD
+app.get("/getPartidaById", (req, res) => {
+  const id = req.query.id;
+  bbdd
+    .obtenerPartidas(id)
+    .then((rows) => {
+      console.log(`${rows.length} partida(s) encontrada(s) en la BBDD con el id: ${id}`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows.length} partida(s) encontrada(s) en la BBDD con el id: ${id}`,
+        partidas: rows
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para obtener tematicas en BBDD por id
+app.get("/getTematicaById", (req, res) => {
+  const id = req.query.id;
+  bbdd
+    .obtenerTematicas(id)
+    .then((rows) => {
+      console.log(`${rows.length} tematica(s) encontrada(s) en la BBDD con el id: ${id}`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows.length} tematica(s) encontrada(s) en la BBDD con el id: ${id}`,
+        tematicas: rows
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para obtener todas las tematicas en BBDD
+app.get("/getTematicas", (req, res) => {
+  bbdd.getAllTematicas()
+    .then((rows) => {
+      console.log(`${rows.length} tematica(s) encontrada(s) en la BBDD`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows.length} tematica(s) encontrada(s) en la BBDD`,
+        tematicas: rows
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para obtener partidas en BBDD
+app.get("/getJugadorById", (req, res) => {
+  const partida_id = req.query.partida_id;
+  bbdd
+    .obtenerJugadoresPartida(partida_id)
+    .then((rows) => {
+      console.log(`${rows.length} jugador(es) conectado(s) a la partida con el id: ${partida_id}`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows.length} jugador(es) conectado(s) a la partida con el id: ${partida_id}`,
+        jugadoresConectados: rows
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
+
+// Ruta para actualizar partidas en BBDD
+app.put("/updatePartida", (req, res) => {
+  const nuevaPartida = req.body;
+  bbdd
+    .updatePartida(nuevaPartida)
+    .then((rows) => {
+      console.log(`${rows} partida actualizada`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows} partida actualizada`,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para actualizar tematicas en BBDD
+app.put("/updateTematica", (req, res) => {
+  const nuevaTematica = req.body;
+  bbdd
+    .updatePartida(nuevaTematica)
+    .then((rows) => {
+      console.log(`${rows} tematica actualizada`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows} tematica actualizada`,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
+// Ruta para actualizar partidas en BBDD
+app.put("/updateJugador", (req, res) => {
+  const peticion = req.body;
+  bbdd
+    .updateCampoJugador(peticion.id, peticion.columna, peticion.valor)
+    .then((rows) => {
+      console.log(`${rows} jugador actualizado`);
+      // Enviar una respuesta al cliente
+      res.json({
+        success: true,
+        mensaje: `${rows} jugador actualizado`,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al consultar partida:", error);
+      res.json({error});
+    });
+});
 
 //Ruta para acceder a la pantalla de administracion
 app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
-// La lógica para registrar a un usuario en una partida podría ser algo así
+// La lógica para registrar a un usuario en una partida con socket
 io.on("connection", (socket) => {
-  console.log("Socket levantado: " + socket.id);
+  const socket_id = socket.id
+  console.log("Socket levantado: " + socket_id);
 
   // Evento para unirse a una partida
-  socket.on("unirsePartida", ({ partida, nombreJugadorActual }) => {
-    // Verificar que aún hay espacio para más jugadores
-    if (partida.jugadoresConectados.length < partida.jugadores) {
-      //agregar jugador al JSON de la partida
-      const nuevoJugador = {
-        nombre: nombreJugadorActual,
-        impostor: false,
-        socketId: socket.id,
-      };
-      agregarJugador(partida.id, nuevoJugador);
-      //añadir el nombre del jugador a la lista de jugadores que estan conectados
-      partida.jugadoresConectados.push(nuevoJugador);
-      const jugadoresConectadosActuales = partida.jugadoresConectados;
-      console.log(
-        "Lista de jugadores conectados a la partida: ",
-        jugadoresConectadosActuales
-      );
+  socket.on("unirsePartida", ({ nuevoJugador }) => {
+      //agregr jugador al JSON de la partida
+      nuevoJugador.socket_id = socket_id;
+      actualizarJugador(nuevoJugador);
       //añadir socket del jugador a la sala
-      socket.join(partida.id);
+      socket.join(nuevoJugador.partida_id);
+     
       // Emitir a todos los clientes en la misma partida que se ha unido un jugador
-      io.to(partida.id).emit("jugadorUnido", {
-        partida,
-        nuevoJugador,
-        jugadoresConectadosActuales,
+      io.to(nuevoJugador.partida_id).emit("jugadorUnido", {
+        nuevoJugador
       });
 
       console.log(
-        `Jugador ${nuevoJugador.nombre} se ha unido a la partida ${partida.id}`
+        `Jugador "${nuevoJugador.nombre}" se ha unido a la partida ${nuevoJugador.partida_id}`
       );
-      //Comprobamos que estan todos los jugadores conectados
-      if (jugadoresConectadosActuales.length == partida.jugadores) {
-        const socketIdSala = io.sockets.adapter.rooms.get(partida.id);
-        //metodo que genera aleatoriamente el impostor
-        const partidaBarajada = asignarImpostores(partida);
-        actualizarPartida(partidaBarajada);
-        //Lógica para enviar mensajes a cada jugador
-        const primerJugador = numeroAleatorioHasta(partida.jugadores);
-        partida.jugadoresConectados.forEach((jugador, indice) => enviarMensajeJugadores(jugador, partida.tematica, indice, primerJugador));
-        // const mensajePersonalizado = `La tematica es: ${partida.tematica}`;
-        // enviarMensajeJugadores(socketIdSala, mensajePersonalizado);
-      }
-    } else {
-      // Informar al cliente que la partida está llena
-      socket.emit("todosConectados", {
-        mensaje:
-          "La partida está llena, hay " +
-          partida.jugadores +
-          " jugadores conectados",
-      });
-      console.log(
-        `La partida ${partida.id} esta llena, hay ${partida.jugadoresConectados.length} jugadores conectados`
-      );
-    }
 
-    //isSocketinRoom(partida.id, socket.id);
+
+     
+  });
+
+  socket.on("comenzarPartida", ({ jugadoresConectados, partidaCargada }) => {
+    jugadoresConectados.forEach((jugadorConectado) => { 
+      let mensaje = `La tematica para el juego es: <strong> ${partidaCargada.tematica} </strong>`
+      if(jugadorConectado.impostor) mensaje = `¡Eres el impostor ${jugadorConectado.nombre} que no te pillen!`
+      if(jugadorConectado.es_primero) mensaje += `\n¡Eres el primero ${jugadorConectado.nombre} empiezas tu!`
+      enviarMensajeComienzo(jugadorConectado, mensaje);
+    });
   });
   // Resto de la lógica...
 
@@ -170,6 +334,19 @@ function leerJSONPArtidas() {
 
   // Parsea el contenido JSON para manipularlo como un objeto JavaScript
   return JSON.parse(contenidoJSON);
+}
+
+async function actualizarJugador(nuevoJugador){
+  bbdd
+    .updateCampoJugador(nuevoJugador.id, "socket_id", nuevoJugador.socket_id)
+    .then((rowCount) => {
+      console.log(`${rowCount} fila(s) actualizada(s)`);
+      //console.log(`${JSON.stringify(rowCount, null, 2)} jugador registrado correctamente en la BBDD`);
+      console.log(`${JSON.stringify(nuevoJugador, null, 2)} registrado correctamente en la BBDD`);
+    })
+    .catch((error) => {
+      console.error("Error al actualizar jugador:", error);
+    });
 }
 
 function agregarJugador(partidaId, nuevoJugador) {
@@ -225,9 +402,12 @@ function enviarMensajeJugadores(jugador, tematica, indice, primerJugador) {
     mensajePersonalizado = "Eres el impostor. ¡Engaña a los demás!";
   else mensajePersonalizado = `La temática es: ${tematica}`;
 
-  if (indice == primerJugador) mensajePersonalizado += "\nTu empiezas. ¡Es el azar!";
+  if (indice == primerJugador)
+    mensajePersonalizado += "\nTu empiezas. ¡Es el azar!";
 
-  console.log(`Jugador ${jugador.nombre}, impostor ${jugador.impostor} con id ${jugador.socketId}`);
+  console.log(
+    `Jugador ${jugador.nombre}, impostor ${jugador.impostor} con id ${jugador.socketId}`
+  );
   console.log(mensajePersonalizado);
 
   io.to(jugador.socketId).emit("comenzarPartida", {
@@ -274,21 +454,21 @@ function asignarImpostores(partida) {
   return partida;
 }
 
-function numeroAleatorioHasta(maximo) {
-    // Aseguramos que maximo sea un número positivo
-    maximo = Math.abs(Math.floor(maximo));
-  
-    // Generamos un número aleatorio entre 0 (inclusive) y 1 (exclusivo)
-    const numeroAleatorio = Math.random();
-  
-    // Escalamos el número aleatorio al rango [0, maximo) y redondeamos
-    const numeroFinal = Math.floor(numeroAleatorio * (maximo + 1));
-  
-    return numeroFinal;
-  }
+function generarAleatorio(maximo) {
+  // Aseguramos que maximo sea un número positivo
+  maximo = Math.abs(Math.floor(maximo));
 
-function enviarMensajeComienzo(jugador){
-    io.to(jugador.socketId).emit("comenzarPartida", {
-        mensaje: mensajePersonalizado,
-      });
+  // Generamos un número aleatorio entre 0 (inclusive) y 1 (exclusivo)
+  const numeroAleatorio = Math.random();
+
+  // Escalamos el número aleatorio al rango [0, maximo) y redondeamos
+  const numeroFinal = Math.floor(numeroAleatorio * (maximo + 1));
+
+  return numeroFinal;
+}
+
+function enviarMensajeComienzo(jugador, mensaje) {
+  io.to(jugador.socket_id).emit("sendAllMessage", {
+    mensaje: mensaje
+  });
 }

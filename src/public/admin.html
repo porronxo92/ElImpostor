@@ -34,6 +34,10 @@
           </div>
 
           <div class="game--feature">
+            <p class="contador game--feature__mensaje" id="texto_error"></p>
+          </div>
+          
+          <div class="game--feature">
             <h4>Temáticas</h4>
             <div class="tematica">
               <div class="tematica--listado">
@@ -50,14 +54,14 @@
                   placeholder="Añadir temática a la lista"
                   required="true"
                 />
-                <button class="game--boton" onclick="agregarTematicaBoton()">Añadir</button>
+                <button id="btnTematica" class="game--boton">Añadir</button>
               </div>
             </div>
           </div>
 
         </div>
         <div class="partida">
-          <button class="game--boton" onclick="generarPartida()">Generar Partida</button>
+          <button id="btnPartida" class="game--boton">Generar Partida</button>
         </div>
       </div>
     </div>

@@ -31,6 +31,10 @@ body {
   background-color: rgb(243, 243, 243);
 }
 
+p{
+  font-size: 1.2rem;
+}
+
 /** Utilidades **/
 .no-margin {
   margin: 0;
@@ -58,10 +62,10 @@ body {
     rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
 
-@media (min-width: 780px ) { 
-    .contenedor{
-      width: 62.5rem;
-    }
+@media (min-width: 780px) {
+  .contenedor {
+    width: 62.5rem;
+  }
 }
 
 a {
@@ -170,7 +174,7 @@ img {
   border-radius: 0.5rem;
 }
 
-.tematica--texto__error{
+.tematica--texto__error {
   width: 100%;
   border: solid;
   border-width: 0.2rem;
@@ -178,7 +182,7 @@ img {
   border-radius: 0.5rem;
 }
 
-.partida{
+.partida {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -222,6 +226,8 @@ img {
   background-color: #fefefe;
   padding: 3rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .cerrar {
@@ -230,4 +236,17 @@ img {
   right: 10px;
   font-size: 20px;
   cursor: pointer;
+}
+
+/* Mensaje Error */
+.game--feature__mensaje{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: rgb(190, 31, 31);
+  border: dotted;
+  border-radius: 1rem;
+  width: 80%;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
 }
