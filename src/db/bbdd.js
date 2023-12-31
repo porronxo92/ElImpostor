@@ -6,7 +6,7 @@ const DATABASE_ELEPHANTSQL = 'postgres://tcexqjal:GvdOPSNNW5BY1MD_PQ-e2-U0tXk3gZ
 const DATABASE_URL = process.env.DATABASE_URL || DATABASE_URL_LOCAL
 
 const pool = new Pool({
-  connectionString: DATABASE_URL_LOCAL,
+  connectionString: DATABASE_URL,
 });
 
 // Métodos para interactuar con la base de datos
