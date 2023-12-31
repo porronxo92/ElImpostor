@@ -164,7 +164,11 @@ function comprobarImpostores(jugadores, impostores) {
   // Calcular el 50% del número de jugadores
   const limiteImpostores = jugadores / 2;
   // Comprobar si el número de impostores supera el límite
-  if (impostores > limiteImpostores) {
+  if (jugadores < 2 || impostores < 1){
+    textoError.innerText =
+      "Debes asignar al menos 2 jugadores y 1 impostor para jugar";
+    return false; // Indica que la comprobación ha fallado
+  } else if (impostores > limiteImpostores) {
     textoError.innerText +=
       "El número de impostores no puede ser más del 50% del número de jugadores. ";
     return false; // Indica que la comprobación ha fallado
