@@ -173,7 +173,7 @@ function comprobarImpostores(jugadores, impostores) {
 }
 
 function comprobarTematica(tematicaSeleccionada) {
-  if (tematicaSeleccionada != "") {
+  if (tematicaSeleccionada == "") {
     textoError.innerText += "Debes seleccionar una tematica de la lista. ";
     return false;
   }

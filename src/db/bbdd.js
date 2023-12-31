@@ -4,7 +4,7 @@ const DATABASE_URL_LOCAL = 'postgres://user_root:ruben.2409@localhost:5432/impos
 const DATABASE_ELEPHANTSQL = 'postgres://tcexqjal:GvdOPSNNW5BY1MD_PQ-e2-U0tXk3gZPb@mel.db.elephantsql.com/tcexqjal';
 
 const DATABASE_URL = process.env.DATABASE_URL || DATABASE_URL_LOCAL
-
+console.log("URL Base de datos: " + DATABASE_URL)
 const pool = new Pool({
   connectionString: DATABASE_URL,
 });
