@@ -302,13 +302,11 @@ io.on("connection", (socket) => {
 
       console.log(
         `Jugador "${nuevoJugador.nombre}" se ha unido a la partida ${nuevoJugador.partida_id}`
-      );
-
-
-     
+      );     
   });
 
   socket.on("comenzarPartida", ({ jugadoresConectados, partidaCargada }) => {
+    console.log("Comenzar partida " + partidaCargada.id)
     jugadoresConectados.forEach((jugadorConectado) => { 
       let mensaje = `La tematica para el juego es: <strong> ${partidaCargada.tematica} </strong>`
       if(jugadorConectado.impostor) mensaje = `¡Eres el impostor ${jugadorConectado.nombre} que no te pillen!`
@@ -316,13 +314,6 @@ io.on("connection", (socket) => {
       enviarMensajeComienzo(jugadorConectado, mensaje);
     });
   });
-  // Resto de la lógica...
-
-  //   // Manejar la desconexión del usuario
-  //   socket.on("disconnect", () => {
-  //     console.log("Socket desconectado");
-  //     // Puedes agregar lógica adicional aquí, por ejemplo, eliminar al usuario de la partida
-  //   });
 });
 
 function leerJSONPArtidas() {

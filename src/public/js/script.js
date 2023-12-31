@@ -4,6 +4,7 @@ const nombreJugador = document.querySelector("#jugador");
 const main = document.querySelector(".main");
 const tiempoMaximoEspera = 90000; // 90 segundos
 const textomodal = document.querySelector("#textomodal");
+let partidaCargada = null;
 
 // Conectar al servidor de Socket.IO
 const socket = io();
@@ -199,7 +200,7 @@ async function jugadoresConectadosPartida(idPartida) {
 
 async function joinGameBBDD() {
   //Primero recogemos la informacion de la partida que se esta jugando
-  const partidaCargada = await getPartida();
+  partidaCargada = await getPartida();
   partidaCargada.forEach((partida) => {
     console.log(
       `Partida cargada --> ID: ${partida.id}, Jugadores: ${partida.jugadores}, Impostores: ${partida.impostores}, Tematica: ${partida.tematica}`
@@ -334,6 +335,7 @@ socket.on("jugadorUnido", (data) => {
 // Escuchar el evento "jugadorUnido"
 async function jugadorUnido(nuevoJugador) {
   const jugadoresConectados = await jugadoresConectadosPartida(nuevoJugador.partida_id);
+  if(jugadoresConectados.length )
   console.log(
     `Lista de jugadores conectados a la partida:${jugadoresConectados.map(
       (jugador) => `- ${jugador.nombre}`
