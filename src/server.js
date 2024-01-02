@@ -308,7 +308,7 @@ io.on("connection", (socket) => {
   socket.on("comenzarPartida", ({ jugadoresConectados, partidaCargada }) => {
     console.log("Comenzar partida " + partidaCargada.id)
     jugadoresConectados.forEach((jugadorConectado) => { 
-      let mensaje = `La tematica para el juego es: <strong> ${partidaCargada.tematica} </strong>`
+      let mensaje = `¡A jugar <strong> ${jugadorConectado.nombre} </strong>!\nLa tematica es: <strong> ${partidaCargada.tematica} </strong>`
       if(jugadorConectado.impostor) mensaje = `¡Eres el impostor ${jugadorConectado.nombre} que no te pillen!`
       if(jugadorConectado.es_primero) mensaje += `\n¡Eres el primero ${jugadorConectado.nombre} empiezas tu!`
       enviarMensajeComienzo(jugadorConectado, mensaje);

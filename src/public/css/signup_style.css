@@ -81,6 +81,23 @@ body {
   padding-bottom: 3rem;
 }
 
+.cabecera__main{
+  display: flex;
+  margin: 0 1rem;  
+}
+
+.texto__cabecera{
+  width: 90%;
+}
+
+.btn__cabecera{
+  background-image: url("../img/info_icon.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 10%;
+  cursor: pointer;
+}
+
 label {
   color: var(--oro-400);
   font-size: 2.3em;

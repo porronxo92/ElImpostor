@@ -2,15 +2,35 @@ const idPartida = obtenerValorParametro("id");
 const JoinButton = document.querySelector("#JoinButton");
 const nombreJugador = document.querySelector("#jugador");
 const main = document.querySelector(".main");
-const tiempoMaximoEspera = 90000; // 90 segundos
+const tiempoMaximoEspera = 180000; // 3 minutos - 180 seg
 const textomodal = document.querySelector("#textomodal");
 let partidaCargada = null;
 
 // Conectar al servidor de Socket.IO
 const socket = io();
 
+// Cerrar la modal al hacer clic fuera de ella
+window.onclick = function(event) {
+  var modal = document.getElementById('modal');
+  if (event.target === modal) {
+    cerrarModal()
+  }
+}
+
+// Inicializa Tippy para el botón de información
+tippy("#btn_informacion", {
+  content: `"El Impostor" es un juego donde los jugadores deben identificar al impostor entre ellos. Cada jugador dira una palabra relacionadas con la temática por turno, deben descubrir quién es el impostor a través de las respuestas.`,
+  placement: "top-end", // Puedes ajustar la posición del tooltip según tus necesidades
+  arrow: true,
+  animation: "fade",
+});
+
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Id de la partida: " + idPartida);
+  if (idPartida == null) {
+    mostrarSpinner(false);
+    textomodal.innerHTML = "No hay id de partida registrado.";
+  }
 });
 
 JoinButton.addEventListener("click", () => {
@@ -38,12 +58,12 @@ function generarAleatorio(maximo) {
   const numeroAleatorio = Math.random();
 
   // Escalamos el número aleatorio al rango [0, maximo) y redondeamos
-  const numeroFinal = Math.floor(numeroAleatorio * (maximo));
+  const numeroFinal = Math.floor(numeroAleatorio * maximo);
 
   return numeroFinal;
 }
 
-function addTextoModal(mensaje){
+function addTextoModal(mensaje) {
   textomodal.innerHTML += "\n" + mensaje;
   console.log(textomodal.innerHTML);
 }
@@ -55,58 +75,61 @@ async function unirsePartida(partidaCargada, jugadoresConectadosEnPartida) {
   console.log("Usuario que se unira a la partida:" + nombreJugadorActual);
   //INSERT del jugador en la BBDD
   // Verificar que aún hay espacio para más jugadores
-  console.log(`Jugadores conectados en partida ${jugadoresConectadosEnPartida.length}`)
-  console.log(`Jugadores totales de la partida ${partidaCargada.jugadores}`)
-  if (jugadoresConectadosEnPartida.length < partidaCargada.jugadores) {
-    const nuevoJugador = {
-      id: generateGuid(),
-      partida_id: partidaCargada.id,
-      nombre: nombreJugadorActual,
-      impostor: false,
-      socket_id: "",
-      es_primero: false,
-    };
-    console.log(await insertJugador(nuevoJugador));
-
-    //Añadimos el jugador a la room con id_partida del socket y recibimos el socket_id
-    socket.emit("unirsePartida", { nuevoJugador });
-
-    //Comprobamos si la sala esta completa, si esta completa y es el jugador+1 en entrar, se envia mensaje de "sala completa"
-    //Si no esta llena, mostramos los usuarios que se van conectando
-    //cuando esten todos dentro de la sala, generamos aleatoriamente el impostor y el que comienza y lanzamos los mensajes a cada jugador
-    await comprobarSala(partidaCargada);
-
-
-    
-  } else {
-    console.log(
-      `La partida ${partidaCargada.id} esta llena, hay ${partidaCargada.jugadores} jugadores conectados`
-    );
-    textomodal.innerHTML = `La partida esta llena, hay ${partidaCargada.jugadores} jugadores conectados`;
+  console.log(
+    `Jugadores conectados en partida ${jugadoresConectadosEnPartida.length}`
+  );
+  if (nombreJugadorActual == "") {
     mostrarSpinner(false);
+    textomodal.innerHTML =
+      "Nombre del jugador vacio, ingresa un nombre para poder jugar.";
+  } else {
+    console.log(`Jugadores totales de la partida ${partidaCargada.jugadores}`);
+    if (jugadoresConectadosEnPartida.length < partidaCargada.jugadores) {
+      const nuevoJugador = {
+        id: generateGuid(),
+        partida_id: partidaCargada.id,
+        nombre: nombreJugadorActual,
+        impostor: false,
+        socket_id: "",
+        es_primero: false,
+      };
+      console.log(await insertJugador(nuevoJugador));
+
+      //Añadimos el jugador a la room con id_partida del socket y recibimos el socket_id
+      socket.emit("unirsePartida", { nuevoJugador });
+
+      //Comprobamos si la sala esta completa, si esta completa y es el jugador+1 en entrar, se envia mensaje de "sala completa"
+      //Si no esta llena, mostramos los usuarios que se van conectando
+      //cuando esten todos dentro de la sala, generamos aleatoriamente el impostor y el que comienza y lanzamos los mensajes a cada jugador
+      await comprobarSala(partidaCargada);
+    } else {
+      console.log(
+        `La partida ${partidaCargada.id} esta llena, hay ${partidaCargada.jugadores} jugadores conectados`
+      );
+      textomodal.innerHTML = `La partida esta llena, hay ${partidaCargada.jugadores} jugadores conectados`;
+      mostrarSpinner(false);
+    }
+    setTimeout(() => {
+      // Oculta el spinner (cambia esta lógica según tu implementación específica)
+      quitarSpinner();
+    }, tiempoMaximoEspera);
   }
-
-  
-
-  setTimeout(() => {
-    // Oculta el spinner (cambia esta lógica según tu implementación específica)
-    quitarSpinner();
-  }, tiempoMaximoEspera);
 }
 
-async function comprobarSala(partidaCargada){
-  let jugadoresConectados = await jugadoresConectadosPartida(
-    partidaCargada.id
-  );
-  if (jugadoresConectados.length == partidaCargada.jugadores){
+async function comprobarSala(partidaCargada) {
+  let jugadoresConectados = await jugadoresConectadosPartida(partidaCargada.id);
+  if (jugadoresConectados.length == partidaCargada.jugadores) {
     //Comprobamos que estan todos los jugadores conectados
-    
+
     //   const socketIdSala = io.sockets.adapter.rooms.get(partidaCargada.id);
     //metodo que genera aleatoriamente el impostor
     const numAleatorioImpostor = generarAleatorio(jugadoresConectados.length);
     const numAleatorioComenzar = generarAleatorio(jugadoresConectados.length);
-    await Promise.all([asignarImpostor(jugadoresConectados[numAleatorioImpostor]), asignarComienzo(jugadoresConectados[numAleatorioComenzar])]);
-    console.log(`Impostor y primer jugador asignados`)
+    await Promise.all([
+      asignarImpostor(jugadoresConectados[numAleatorioImpostor]),
+      asignarComienzo(jugadoresConectados[numAleatorioComenzar]),
+    ]);
+    console.log(`Impostor y primer jugador asignados`);
     addTextoModal(`Impostor y primer jugador asignados`);
 
     jugadoresConectados = await jugadoresConectadosPartida(partidaCargada.id);
@@ -114,20 +137,21 @@ async function comprobarSala(partidaCargada){
     comenzarPartida(jugadoresConectados, partidaCargada);
 
     //const socketIdSala = io.sockets.adapter.rooms.get(partidaCargada.id);
-     
- }else{
-  console.log(
-    `La partida ${partidaCargada.id} aun no esta completa, faltan ${partidaCargada.jugadores - jugadoresConectados.length} jugador(es) para empezar`
-  );
- }
+  } else {
+    console.log(
+      `La partida ${partidaCargada.id} aun no esta completa, faltan ${
+        partidaCargada.jugadores - jugadoresConectados.length
+      } jugador(es) para empezar`
+    );
+  }
 }
 
-async function comenzarPartida(jugadoresConectados, partidaCargada){
+async function comenzarPartida(jugadoresConectados, partidaCargada) {
   //Enviamos mensaje al servidor para que comience la partida con los jugadores conectados
   socket.emit("comenzarPartida", { jugadoresConectados, partidaCargada });
 }
 
-async function asignarImpostor(jugadorImpostor){
+async function asignarImpostor(jugadorImpostor) {
   //modificamos en bbdd al jugador impostor
   return new Promise((resolve, reject) => {
     fetch(`/updateJugador`, {
@@ -136,9 +160,9 @@ async function asignarImpostor(jugadorImpostor){
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: jugadorImpostor.id, 
-        columna: "impostor", 
-        valor: true
+        id: jugadorImpostor.id,
+        columna: "impostor",
+        valor: true,
       }),
     })
       .then((response) => response.json())
@@ -146,14 +170,12 @@ async function asignarImpostor(jugadorImpostor){
         resolve(data);
       })
       .catch((error) => {
-        reject(error),
-        console.error("Error al agregar el jugador:", error)
-        }
-      );
+        reject(error), console.error("Error al agregar el jugador:", error);
+      });
   });
 }
 
-async function asignarComienzo(primerJugador){
+async function asignarComienzo(primerJugador) {
   return new Promise((resolve, reject) => {
     fetch(`/updateJugador`, {
       method: "PUT",
@@ -161,9 +183,9 @@ async function asignarComienzo(primerJugador){
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: primerJugador.id, 
-        columna: "es_primero", 
-        valor: true
+        id: primerJugador.id,
+        columna: "es_primero",
+        valor: true,
       }),
     })
       .then((response) => response.json())
@@ -171,10 +193,8 @@ async function asignarComienzo(primerJugador){
         resolve(data);
       })
       .catch((error) => {
-        reject(error),
-        console.error("Error al agregar el jugador:", error)
-        }
-      );
+        reject(error), console.error("Error al agregar el jugador:", error);
+      });
   });
 }
 
@@ -198,33 +218,44 @@ async function jugadoresConectadosPartida(idPartida) {
   });
 }
 
+function comprobarPartida(partida) {
+  if (partida == undefined) {
+    return false;
+  }
+  return true;
+}
+
 async function joinGameBBDD() {
-  //Primero recogemos la informacion de la partida que se esta jugando
+  //Primero cargamos la partida
   partidaCargada = await getPartida();
   partidaCargada.forEach((partida) => {
     console.log(
       `Partida cargada --> ID: ${partida.id}, Jugadores: ${partida.jugadores}, Impostores: ${partida.impostores}, Tematica: ${partida.tematica}`
     );
   });
-
-  //Segundo, vemos si hay algun jugador conectado
-  const jugadoresConectados = await jugadoresConectadosPartida(
-    partidaCargada[0].id
-  );
-  console.log(
-    `Hay ${jugadoresConectados.length} jugadores conectados a la partida ${partidaCargada[0].id}`
-  );
-  jugadoresConectados.forEach((jugador, indice) => {
-    console.log(
-      `Jugador ${indice + 1} \nNombre: ${jugador.nombre}, Impostor: ${
-        jugador.impostor
-      }`
+  if (!comprobarPartida(partidaCargada[0])) {
+    mostrarSpinner(false);
+    textomodal.innerHTML = "La partida no existe, no puedes unirte.";
+  } else {
+    //Segundo, vemos si hay algun jugador conectado
+    const jugadoresConectados = await jugadoresConectadosPartida(
+      partidaCargada[0].id
     );
-  });
-  console.log(`Conectandose a la partida ${partidaCargada[0].id}...`);
+    console.log(
+      `Hay ${jugadoresConectados.length} jugadores conectados a la partida ${partidaCargada[0].id}`
+    );
+    jugadoresConectados.forEach((jugador, indice) => {
+      console.log(
+        `Jugador ${indice + 1} \nNombre: ${jugador.nombre}, Impostor: ${
+          jugador.impostor
+        }`
+      );
+    });
+    console.log(`Conectandose a la partida ${partidaCargada[0].id}...`);
 
-  //Cuando tenemos la partida, conectamos al jugador actual a la partida en curso
-  unirsePartida(partidaCargada[0], jugadoresConectados);
+    //Cuando tenemos la partida, conectamos al jugador actual a la partida en curso
+    unirsePartida(partidaCargada[0], jugadoresConectados);
+  }
 }
 
 async function insertJugador(jugador) {
@@ -235,7 +266,7 @@ async function insertJugador(jugador) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        jugador
+        jugador,
       }),
     })
       .then((response) => response.json())
@@ -243,10 +274,8 @@ async function insertJugador(jugador) {
         resolve(data);
       })
       .catch((error) => {
-        reject(error),
-        console.error("Error al agregar el jugador:", error)
-        }
-      );
+        reject(error), console.error("Error al agregar el jugador:", error);
+      });
   });
 }
 
@@ -290,7 +319,6 @@ async function joinGame() {
     unirsePartida(partidaActual);
   } else {
     console.log(`No se encontró ninguna partida con el ID: ${idPartida}`);
-
   }
 
   //await registrarJugadorPartida();
@@ -334,8 +362,10 @@ socket.on("jugadorUnido", (data) => {
 
 // Escuchar el evento "jugadorUnido"
 async function jugadorUnido(nuevoJugador) {
-  const jugadoresConectados = await jugadoresConectadosPartida(nuevoJugador.partida_id);
-  if(jugadoresConectados.length )
+  const jugadoresConectados = await jugadoresConectadosPartida(
+    nuevoJugador.partida_id
+  );
+
   console.log(
     `Lista de jugadores conectados a la partida:${jugadoresConectados.map(
       (jugador) => `- ${jugador.nombre}`

@@ -11,23 +11,23 @@
   <body>
     <!-- Spinner container -->
     <div class="contenedor">
-      <div class="context">
-        <div class="main">
-          
-          <h2 class="centrar-texto">EL IMPOSTOR</h2>
-          <div class="formulario">
-            <input
-              id="jugador"
-              class="campo campo--texto"
-              type="text"
-              name="txt"
-              placeholder="Nombre"
-              required="true"
-            />
-            <button id="JoinButton" class="campo campo--submit">
-              Unirse al juego
-            </button>
-          </div>
+      <div class="main">
+        <div class="cabecera__main">
+          <h2 class="centrar-texto texto__cabecera">EL IMPOSTOR</h2>
+          <a class="btn__cabecera" id="btn_informacion"></a>
+        </div>
+        <div class="formulario">
+          <input
+            id="jugador"
+            class="campo campo--texto"
+            type="text"
+            name="txt"
+            placeholder="Nombre"
+            required="true"
+          />
+          <button id="JoinButton" class="campo campo--submit">
+            Unirse al juego
+          </button>
         </div>
       </div>
     </div>
@@ -38,7 +38,9 @@
         <div id="spinner" class="spinner"></div>
       </div>
     </div>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+      <script src="https://unpkg.com/tippy.js@6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
   </body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
   <script src="js/script.js"></script>
 </html>
