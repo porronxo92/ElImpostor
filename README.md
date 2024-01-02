@@ -20,7 +20,7 @@ Bienvenido al repositorio de "El Impostor", un juego de misterio y estrategia.
 
 ## Uso
 
-1. Accede a la interfaz del administrador: `https://juegoimpostor.2.ie-1.fl0.io/admin`
+1. Accede a la interfaz del administrador: <href>`https://juegoimpostor.2.ie-1.fl0.io/admin`</href>
 2. Crea una nueva partida, asigna impostores y temática.
 3. Comparte el enlace con los jugadores.
 4. Los jugadores se unen y el juego comienza.
