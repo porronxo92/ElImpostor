@@ -28,7 +28,11 @@ html {
 body {
   font-size: 1.6rem;
   font-family: "Jost", sans-serif;
-  background-color: rgb(243, 243, 243);
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.6448704481792717) 0%,
+    rgba(223, 141, 18, 1) 100%
+  );
 }
 
 p{

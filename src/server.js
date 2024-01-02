@@ -310,7 +310,7 @@ io.on("connection", (socket) => {
     jugadoresConectados.forEach((jugadorConectado) => { 
       let mensaje = `¡A jugar <strong>${jugadorConectado.nombre}</strong>!<br>La tematica es: <strong> ${partidaCargada.tematica} </strong>`
       if(jugadorConectado.impostor) mensaje = `¡Eres el impostor ${jugadorConectado.nombre} que no te pillen!`
-      if(jugadorConectado.es_primero) mensaje += `\n¡Eres el primero ${jugadorConectado.nombre} empiezas tu!`
+      if(jugadorConectado.es_primero) mensaje += `<br>¡Eres el primero ${jugadorConectado.nombre} empiezas tu!`
       enviarMensajeComienzo(jugadorConectado, mensaje);
     });
   });
