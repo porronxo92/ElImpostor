@@ -10,12 +10,12 @@ let partidaCargada = null;
 const socket = io();
 
 // Cerrar la modal al hacer clic fuera de ella
-window.onclick = function(event) {
-  var modal = document.getElementById('modal');
+window.onclick = function (event) {
+  var modal = document.getElementById("modal");
   if (event.target === modal) {
-    cerrarModal()
+    cerrarModal();
   }
-}
+};
 
 // Inicializa Tippy para el botón de información
 tippy("#btn_informacion", {
@@ -69,51 +69,43 @@ function addTextoModal(mensaje) {
 }
 
 // Evento para unirse a la partida
-async function unirsePartida(partidaCargada, jugadoresConectadosEnPartida) {
-  //Conectamos a la partida al jugador, agregamos el jugador a la BBDD
-  const nombreJugadorActual = nombreJugador.value;
+async function unirsePartida(partidaCargada, jugadoresConectadosEnPartida, nombreJugadorActual) {
   console.log("Usuario que se unira a la partida:" + nombreJugadorActual);
   //INSERT del jugador en la BBDD
   // Verificar que aún hay espacio para más jugadores
   console.log(
     `Jugadores conectados en partida ${jugadoresConectadosEnPartida.length}`
   );
-  if (nombreJugadorActual == "") {
-    mostrarSpinner(false);
-    textomodal.innerHTML =
-      "Nombre del jugador vacio, ingresa un nombre para poder jugar.";
+  console.log(`Jugadores totales de la partida ${partidaCargada.jugadores}`);
+  if (jugadoresConectadosEnPartida.length < partidaCargada.jugadores) {
+    const nuevoJugador = {
+      id: generateGuid(),
+      partida_id: partidaCargada.id,
+      nombre: nombreJugadorActual,
+      impostor: false,
+      socket_id: "",
+      es_primero: false,
+    };
+    console.log(await insertJugador(nuevoJugador));
+
+    //Añadimos el jugador a la room con id_partida del socket y recibimos el socket_id
+    socket.emit("unirsePartida", { nuevoJugador });
+
+    //Comprobamos si la sala esta completa, si esta completa y es el jugador+1 en entrar, se envia mensaje de "sala completa"
+    //Si no esta llena, mostramos los usuarios que se van conectando
+    //cuando esten todos dentro de la sala, generamos aleatoriamente el impostor y el que comienza y lanzamos los mensajes a cada jugador
+    await comprobarSala(partidaCargada);
   } else {
-    console.log(`Jugadores totales de la partida ${partidaCargada.jugadores}`);
-    if (jugadoresConectadosEnPartida.length < partidaCargada.jugadores) {
-      const nuevoJugador = {
-        id: generateGuid(),
-        partida_id: partidaCargada.id,
-        nombre: nombreJugadorActual,
-        impostor: false,
-        socket_id: "",
-        es_primero: false,
-      };
-      console.log(await insertJugador(nuevoJugador));
-
-      //Añadimos el jugador a la room con id_partida del socket y recibimos el socket_id
-      socket.emit("unirsePartida", { nuevoJugador });
-
-      //Comprobamos si la sala esta completa, si esta completa y es el jugador+1 en entrar, se envia mensaje de "sala completa"
-      //Si no esta llena, mostramos los usuarios que se van conectando
-      //cuando esten todos dentro de la sala, generamos aleatoriamente el impostor y el que comienza y lanzamos los mensajes a cada jugador
-      await comprobarSala(partidaCargada);
-    } else {
-      console.log(
-        `La partida ${partidaCargada.id} esta llena, hay ${partidaCargada.jugadores} jugadores conectados`
-      );
-      textomodal.innerHTML = `La partida esta llena, hay ${partidaCargada.jugadores} jugadores conectados`;
-      mostrarSpinner(false);
-    }
-    setTimeout(() => {
-      // Oculta el spinner (cambia esta lógica según tu implementación específica)
-      quitarSpinner();
-    }, tiempoMaximoEspera);
+    console.log(
+      `La partida ${partidaCargada.id} esta llena, hay ${partidaCargada.jugadores} jugadores conectados`
+    );
+    textomodal.innerHTML = `La partida esta llena, hay ${partidaCargada.jugadores} jugadores conectados`;
+    mostrarSpinner(false);
   }
+  setTimeout(() => {
+    // Oculta el spinner (cambia esta lógica según tu implementación específica)
+    quitarSpinner();
+  }, tiempoMaximoEspera);
 }
 
 async function comprobarSala(partidaCargada) {
@@ -226,35 +218,44 @@ function comprobarPartida(partida) {
 }
 
 async function joinGameBBDD() {
-  //Primero cargamos la partida
-  partidaCargada = await getPartida();
-  partidaCargada.forEach((partida) => {
-    console.log(
-      `Partida cargada --> ID: ${partida.id}, Jugadores: ${partida.jugadores}, Impostores: ${partida.impostores}, Tematica: ${partida.tematica}`
-    );
-  });
-  if (!comprobarPartida(partidaCargada[0])) {
+  const nombreJugadorActual = nombreJugador.value.toUpperCase();
+  if (nombreJugadorActual == "") {
     mostrarSpinner(false);
-    textomodal.innerHTML = "La partida no existe, no puedes unirte.";
+    textomodal.innerHTML =
+      "Nombre del jugador vacio, ingresa un nombre para poder jugar.";
+    console.log("Nombre jugador vacio. ");
   } else {
-    //Segundo, vemos si hay algun jugador conectado
-    const jugadoresConectados = await jugadoresConectadosPartida(
-      partidaCargada[0].id
-    );
-    console.log(
-      `Hay ${jugadoresConectados.length} jugadores conectados a la partida ${partidaCargada[0].id}`
-    );
-    jugadoresConectados.forEach((jugador, indice) => {
+    console.log("Usuario que se unira a la partida: " + nombreJugadorActual);
+    //Primero cargamos la partida
+    partidaCargada = await getPartida();
+    partidaCargada.forEach((partida) => {
       console.log(
-        `Jugador ${indice + 1} \nNombre: ${jugador.nombre}, Impostor: ${
-          jugador.impostor
-        }`
+        `Partida cargada --> ID: ${partida.id}, Jugadores: ${partida.jugadores}, Impostores: ${partida.impostores}, Tematica: ${partida.tematica}`
       );
     });
-    console.log(`Conectandose a la partida ${partidaCargada[0].id}...`);
+    if (!comprobarPartida(partidaCargada[0])) {
+      mostrarSpinner(false);
+      textomodal.innerHTML = "La partida no existe, no puedes unirte.";
+    } else {
+      //Segundo, vemos si hay algun jugador conectado
+      const jugadoresConectados = await jugadoresConectadosPartida(
+        partidaCargada[0].id
+      );
+      console.log(
+        `Hay ${jugadoresConectados.length} jugadores conectados a la partida ${partidaCargada[0].id}`
+      );
+      jugadoresConectados.forEach((jugador, indice) => {
+        console.log(
+          `Jugador ${indice + 1} \nNombre: ${jugador.nombre}, Impostor: ${
+            jugador.impostor
+          }`
+        );
+      });
+      console.log(`Conectandose a la partida ${partidaCargada[0].id}...`);
 
-    //Cuando tenemos la partida, conectamos al jugador actual a la partida en curso
-    unirsePartida(partidaCargada[0], jugadoresConectados);
+      //Cuando tenemos la partida, conectamos al jugador actual a la partida en curso
+      unirsePartida(partidaCargada[0], jugadoresConectados, nombreJugadorActual);
+    }
   }
 }
 
@@ -297,31 +298,6 @@ async function getPartida() {
         reject(error);
       });
   });
-}
-
-async function joinGame() {
-  const archivo = "json/partidas.json";
-  // Ajustar la duración del temporizador según tus necesidades (en segundos)
-  const resultado = await fetch(archivo);
-  const datos = await resultado.json();
-  const partidaActual = datos.partidas.find(
-    (partida) => partida.id == idPartida
-  );
-  console.log(partidaActual);
-  if (partidaActual) {
-    // Acceder a los demás valores de la partida
-    const jugadores = partidaActual.jugadores;
-    const impostores = partidaActual.impostores;
-    const tematica = partidaActual.tematica;
-    console.log(
-      `ID: ${idPartida}, Jugadores: ${jugadores}, Impostores: ${impostores}, Tematica: ${tematica} el jugador que se va a unir es ${nombreJugador.value}`
-    );
-    unirsePartida(partidaActual);
-  } else {
-    console.log(`No se encontró ninguna partida con el ID: ${idPartida}`);
-  }
-
-  //await registrarJugadorPartida();
 }
 
 function mostrarSpinner(spinner) {
