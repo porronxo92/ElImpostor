@@ -182,9 +182,10 @@ img {
   width: 100%;
   border: solid;
   border-width: 0.2rem;
-  border-color: red;
   border-radius: 0.5rem;
 }
+
+
 
 .partida {
   display: flex;
@@ -247,10 +248,14 @@ img {
   display: none;
   align-items: center;
   justify-content: center;
-  color: rgb(190, 31, 31);
   border: dotted;
   border-radius: 1rem;
+  color: rgb(190, 31, 31);
   width: 80%;
   margin: 1rem auto;
   padding: 0.5rem 1rem;
+}
+
+.correcto {
+  color: green;
 }

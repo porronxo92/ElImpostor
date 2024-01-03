@@ -65,8 +65,6 @@ async function agregarTematica() {
     console.log("Id tematica: " + idTematica);
     // Verificar que no esté vacío
     if (nuevaTematica !== "") {
-      textoError.innerHTML = "";
-      textoError.style.display = "none";
       // Cargar el archivo JSON local
       // Realizar la solicitud POST con los parámetros
       fetch(`/RegistroTematicaBBDD`, {
@@ -86,6 +84,10 @@ async function agregarTematica() {
           nuevaTematicaInput.value = "";
           nuevaTematicaInput.classList.add("tematica--texto");
           getTematicas();
+          textoError.innerHTML = "Nueva tematica añadida. Revise el listado.";
+          textoError.classList.add("correcto")
+          textoError.style.display = "block";
+          
         })
         .catch((error) =>
           console.error("Error al agregar la temática:", error)
@@ -95,6 +97,9 @@ async function agregarTematica() {
       textoError.innerHTML = "Campo vacio. Debes escribir una tematica.";
       textoError.style.display = "block";
     }
+    setTimeout(function() {
+      textoError.style.display = "none";
+    }, 4000);
   } catch (error) {
     console.log(error);
   }
