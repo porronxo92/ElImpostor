@@ -66,7 +66,7 @@ async function agregarTematica() {
     // Verificar que no esté vacío
     if (nuevaTematica !== "") {
       textoError.innerHTML = "";
-      textoError.classList.display = "none";
+      textoError.style.display = "none";
       // Cargar el archivo JSON local
       // Realizar la solicitud POST con los parámetros
       fetch(`/RegistroTematicaBBDD`, {
