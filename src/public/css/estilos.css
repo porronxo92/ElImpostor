@@ -233,6 +233,7 @@ img {
   text-align: center;
   display: flex;
   flex-direction: column;
+  gap: 2rem;
 }
 
 .cerrar {
@@ -258,4 +259,16 @@ img {
 
 .correcto {
   color: green;
+}
+
+
+
+.modal__share{
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.icon_modal{
+  width: 2rem;
+  cursor: pointer;
 }

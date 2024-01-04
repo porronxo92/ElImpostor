@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Administracion Impostor</title>
     <link rel="stylesheet" type="text/css" href="css/estilos.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
   </head>
   <body>
     <div class="contenedor">
@@ -20,33 +20,51 @@
           <div class="game--feature">
             <h4>Jugadores</h4>
             <div class="contador">
-              <button class="game--boton" onclick="decrementarContadorJugador()">-</button>
+              <button
+                class="game--boton"
+                onclick="decrementarContadorJugador()"
+              >
+                -
+              </button>
               <p id="contJugador" class="contador">0</p>
-              <button class="game--boton" onclick="incrementarContadorJugador()">+</button>
+              <button
+                class="game--boton"
+                onclick="incrementarContadorJugador()"
+              >
+                +
+              </button>
             </div>
           </div>
 
           <div class="game--feature">
             <h4>Impostores</h4>
             <div class="contador">
-              <button class="game--boton" onclick="decrementarContadorImpostor()">-</button>
+              <button
+                class="game--boton"
+                onclick="decrementarContadorImpostor()"
+              >
+                -
+              </button>
               <p id="contImpostor" class="contador">0</p>
-              <button class="game--boton" onclick="incrementarContadorImpostor()">+</button>
+              <button
+                class="game--boton"
+                onclick="incrementarContadorImpostor()"
+              >
+                +
+              </button>
             </div>
           </div>
 
           <div class="game--feature">
             <p class="contador game--feature__mensaje" id="texto_error"></p>
           </div>
-          
+
           <div class="game--feature">
             <h4>Temáticas</h4>
             <div class="tematica">
               <div class="tematica--listado">
                 <h5>Listado</h5>
-                <select 
-                  id="listado_tematica"
-                ></select>
+                <select id="listado_tematica"></select>
               </div>
               <div class="tematica--add">
                 <input
@@ -60,7 +78,6 @@
               </div>
             </div>
           </div>
-
         </div>
         <div class="partida">
           <button id="btnPartida" class="game--boton">Generar Partida</button>
@@ -68,13 +85,19 @@
       </div>
     </div>
     <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="cerrar" onclick="cerrarModal()">X</span>
-            <canvas id="codigoQR"></canvas>
-            <a id="partida_nueva">Ir a la partida</a>
+      <div class="modal-content">
+        <span class="cerrar" onclick="cerrarModal()">X</span>
+        <canvas id="codigoQR"></canvas>
+        <a id="partida_nueva">Ir a la partida</a>
+        <div class="modal__share">
+          <img src="img/CopyIcon.svg" alt="Copiar portapapeles" id="copy_icon" class="icon_modal">
+          <img src="img/whatsapIcon.svg" alt="whatsApp" id="share_WhatsApp" class="icon_modal">
         </div>
-    </div>    
+      </div>
+    </div>
   </body>
-  <script src="js/admin.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script src="js/admin.js"></script>
 </html>
