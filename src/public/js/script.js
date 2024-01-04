@@ -19,8 +19,8 @@ window.onclick = function (event) {
 
 // Inicializa Tippy para el botón de información
 tippy("#btn_informacion", {
-  content: `"El Impostor" es un juego donde los jugadores deben identificar al impostor entre ellos. Cada jugador dira una palabra relacionadas con la temática por turno, deben descubrir quién es el impostor a través de las respuestas.`,
-  placement: "top-end", // Puedes ajustar la posición del tooltip según tus necesidades
+  content: `"El Impostor" es un juego donde los jugadores deben identificar al impostor entre ellos. Cada jugador dirá una palabra relacionada con la temática, una por turno, deben descubrir quién es el impostor a través de sus respuestas.`,
+  placement: "top", // Puedes ajustar la posición del tooltip según tus necesidades
   arrow: true,
   animation: "fade",
 });
@@ -33,8 +33,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-JoinButton.addEventListener("click", () => {
-  joinGameBBDD();
+JoinButton.addEventListener("click", async () => {
+  JoinButton.disabled = true;
+  try {
+    // Realizar la acción o solicitud aquí
+    await joinGameBBDD();
+    console.log("Acción completada exitosamente");
+  } catch (error) {
+    console.error("Error al realizar la acción:", error);
+  }
 });
 
 function obtenerValorParametro(parametro) {
@@ -69,7 +76,11 @@ function addTextoModal(mensaje) {
 }
 
 // Evento para unirse a la partida
-async function unirsePartida(partidaCargada, jugadoresConectadosEnPartida, nombreJugadorActual) {
+async function unirsePartida(
+  partidaCargada,
+  jugadoresConectadosEnPartida,
+  nombreJugadorActual
+) {
   console.log("Usuario que se unira a la partida:" + nombreJugadorActual);
   //INSERT del jugador en la BBDD
   // Verificar que aún hay espacio para más jugadores
@@ -254,7 +265,12 @@ async function joinGameBBDD() {
       console.log(`Conectandose a la partida ${partidaCargada[0].id}...`);
 
       //Cuando tenemos la partida, conectamos al jugador actual a la partida en curso
-      unirsePartida(partidaCargada[0], jugadoresConectados, nombreJugadorActual);
+      unirsePartida(
+        partidaCargada[0],
+        jugadoresConectados,
+        nombreJugadorActual
+      );
+      JoinButton.disabled = false;
     }
   }
 }

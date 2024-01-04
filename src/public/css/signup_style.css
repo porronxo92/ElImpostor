@@ -84,17 +84,16 @@ body {
 .cabecera__main{
   display: flex;
   margin: 0 1rem;  
+  align-items: center;
 }
 
 .texto__cabecera{
-  width: 90%;
+ width: 100%;
 }
 
 .btn__cabecera{
-  background-image: url("../img/info_icon.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  width: 10%;
+  width: 2.5rem;
+  height: 2.5rem;
   cursor: pointer;
 }
 
