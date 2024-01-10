@@ -92,8 +92,8 @@ app.post("/RegistroPartidaBBDD", (req, res) => {
   bbdd
     .insertarPartida(nuevaPartida)
     .then((rowCount) => {
-      console.log(`${rowCount} fila(s) insertada(s)`);
-      console.log(`${nuevaPartida} registrada correctamente en la BBDD`);
+      escribirLog(`${rowCount} fila(s) insertada(s)`, obtenerUbicacionLlamada());
+      escribirLog(`${nuevaPartida} registrada correctamente en la BBDD`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -112,8 +112,8 @@ app.post("/RegistroTematicaBBDD", (req, res) => {
   bbdd
     .insertarTematica(nuevaTematica)
     .then((rowCount) => {
-      console.log(`${rowCount} fila(s) insertada(s)`);
-      console.log(`${nuevaTematica} registrada correctamente en la BBDD`);
+      escribirLog(`${rowCount} fila(s) insertada(s)`, obtenerUbicacionLlamada());
+      escribirLog(`${nuevaTematica} registrada correctamente en la BBDD`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -132,8 +132,8 @@ app.post("/RegistroJugador", (req, res) => {
   bbdd
     .insertarJugadorPartida(nuevoJugador)
     .then((rowCount) => {
-      console.log(`${rowCount} fila(s) insertada(s)`);
-      console.log(`${JSON.stringify({nuevoJugador})} registrado correctamente en la BBDD`);
+      escribirLog(`${rowCount} fila(s) insertada(s)`, obtenerUbicacionLlamada());
+      escribirLog(`${JSON.stringify({nuevoJugador})} registrado correctamente en la BBDD`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -153,7 +153,7 @@ app.get("/getPartidaById", (req, res) => {
   bbdd
     .obtenerPartidas(id)
     .then((rows) => {
-      console.log(`${rows.length} partida(s) encontrada(s) en la BBDD con el id: ${id}`);
+      escribirLog(`${rows.length} partida(s) encontrada(s) en la BBDD con el id: ${id}`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -172,12 +172,12 @@ app.get("/getTematicaById", (req, res) => {
   bbdd
     .obtenerTematicas(id)
     .then((rows) => {
-      console.log(`${rows.length} tematica(s) encontrada(s) en la BBDD con el id: ${id}`);
+      escribirLog(`${rows.length} tematica(s) encontrada(s) en la BBDD con el id: ${id}`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
         mensaje: `${rows.length} tematica(s) encontrada(s) en la BBDD con el id: ${id}`,
-        tematicas: rows
+        tematica: rows[0].tematica
       });
     })
     .catch((error) => {
@@ -189,7 +189,7 @@ app.get("/getTematicaById", (req, res) => {
 app.get("/getTematicas", (req, res) => {
   bbdd.getAllTematicas()
     .then((rows) => {
-      console.log(`${rows.length} tematica(s) encontrada(s) en la BBDD`);
+      escribirLog(`${rows.length} tematica(s) encontrada(s) en la BBDD`, "/getTematicas");
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -208,7 +208,7 @@ app.get("/getJugadorById", (req, res) => {
   bbdd
     .obtenerJugadoresPartida(partida_id)
     .then((rows) => {
-      console.log(`${rows.length} jugador(es) conectado(s) a la partida con el id: ${partida_id}`);
+      escribirLog(`${rows.length} jugador(es) conectado(s) a la partida con el id: ${partida_id}`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -228,7 +228,7 @@ app.put("/updatePartida", (req, res) => {
   bbdd
     .updatePartida(nuevaPartida)
     .then((rows) => {
-      console.log(`${rows} partida actualizada`);
+      escribirLog(`${rows} partida actualizada`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -246,7 +246,7 @@ app.put("/updateTematica", (req, res) => {
   bbdd
     .updatePartida(nuevaTematica)
     .then((rows) => {
-      console.log(`${rows} tematica actualizada`);
+      escribirLog(`${rows} tematica actualizada`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -264,7 +264,7 @@ app.put("/updateJugador", (req, res) => {
   bbdd
     .updateCampoJugador(peticion.id, peticion.columna, peticion.valor)
     .then((rows) => {
-      console.log(`${rows} jugador actualizado`);
+      escribirLog(`${rows} jugador actualizado`, obtenerUbicacionLlamada());
       // Enviar una respuesta al cliente
       res.json({
         success: true,
@@ -285,7 +285,7 @@ app.get("/admin", (req, res) => {
 // La lógica para registrar a un usuario en una partida con socket
 io.on("connection", (socket) => {
   const socket_id = socket.id
-  console.log("Socket levantado: " + socket_id);
+  escribirLog("Socket levantado: " + socket_id, obtenerUbicacionLlamada());
 
   // Evento para unirse a una partida
   socket.on("unirsePartida", ({ nuevoJugador }) => {
@@ -300,15 +300,15 @@ io.on("connection", (socket) => {
         nuevoJugador
       });
 
-      console.log(
-        `Jugador "${nuevoJugador.nombre}" se ha unido a la partida ${nuevoJugador.partida_id}`
+      escribirLog(
+        `Jugador "${nuevoJugador.nombre}" se ha unido a la partida ${nuevoJugador.partida_id}`, obtenerUbicacionLlamada()
       );     
   });
 
-  socket.on("comenzarPartida", ({ jugadoresConectados, partidaCargada }) => {
-    console.log("Comenzar partida " + partidaCargada.id)
+  socket.on("comenzarPartida", ({ jugadoresConectados, tematica_cargada }) => {
+    escribirLog("Comenzar partida ", obtenerUbicacionLlamada())
     jugadoresConectados.forEach((jugadorConectado) => { 
-      let mensaje = `¡A jugar <strong>${jugadorConectado.nombre}</strong>!<br>La tematica es: <strong> ${partidaCargada.tematica} </strong>`
+      let mensaje = `¡A jugar <strong>${jugadorConectado.nombre}</strong>!<br>La tematica es: <strong> ${tematica_cargada} </strong>`
       if(jugadorConectado.impostor) mensaje = `¡Eres el impostor ${jugadorConectado.nombre} que no te pillen!`
       if(jugadorConectado.es_primero) mensaje += `<br>¡Eres el primero ${jugadorConectado.nombre} empiezas tu!`
       enviarMensajeComienzo(jugadorConectado, mensaje);
@@ -331,9 +331,8 @@ async function actualizarJugador(nuevoJugador){
   bbdd
     .updateCampoJugador(nuevoJugador.id, "socket_id", nuevoJugador.socket_id)
     .then((rowCount) => {
-      console.log(`${rowCount} fila(s) actualizada(s)`);
-      //console.log(`${JSON.stringify(rowCount, null, 2)} jugador registrado correctamente en la BBDD`);
-      console.log(`${JSON.stringify(nuevoJugador, null, 2)} registrado correctamente en la BBDD`);
+      escribirLog(`${rowCount} fila(s) actualizada(s)`, obtenerUbicacionLlamada());
+      escribirLog(`${JSON.stringify(nuevoJugador, null, 2)} registrado correctamente en la BBDD`, obtenerUbicacionLlamada());
     })
     .catch((error) => {
       console.error("Error al actualizar jugador:", error);
@@ -355,8 +354,8 @@ function agregarJugador(partidaId, nuevoJugador) {
       path.join(__dirname, "public", "json/partidas.json"),
       JSON.stringify(data, null, 2)
     );
-    console.log(
-      `El jugador ${nuevoJugador.nombre} se ha añadido a la lista de conectados`
+    escribirLog(
+      `El jugador ${nuevoJugador.nombre} se ha añadido a la lista de conectados`, obtenerUbicacionLlamada()
     );
   } else {
     console.error("No se encontró la partida con el ID especificado");
@@ -381,85 +380,63 @@ function actualizarPartida(partidaBarajada) {
       JSON.stringify(data, null, 2)
     );
 
-    console.log("Partida actualizada correctamente.");
+    escribirLog("Partida actualizada correctamente.", obtenerUbicacionLlamada());
   } else {
     console.error("Partida no encontrada.");
   }
 }
 
-function enviarMensajeJugadores(jugador, tematica, indice, primerJugador) {
-  console.log("ID de socket en la sala:", jugador.socketId);
-  if (jugador.impostor)
-    mensajePersonalizado = "Eres el impostor. ¡Engaña a los demás!";
-  else mensajePersonalizado = `La temática es: ${tematica}`;
-
-  if (indice == primerJugador)
-    mensajePersonalizado += "\nTu empiezas. ¡Es el azar!";
-
-  console.log(
-    `Jugador ${jugador.nombre}, impostor ${jugador.impostor} con id ${jugador.socketId}`
-  );
-  console.log(mensajePersonalizado);
-
-  io.to(jugador.socketId).emit("comenzarPartida", {
-    mensaje: mensajePersonalizado,
-  });
-}
-
 // Rutas y lógica de tu aplicación irán aquí
 //const PORT = process.env.PORT || 3000;
 server.listen(port, () => {
-  console.log(`Servidor escuchando en el puerto ${port}`);
+  escribirLog(`Servidor escuchando en el puerto ${port}`, obtenerUbicacionLlamada());
 });
 
 server.on("close", () => {
   io.close(() => {
-    console.log("Los sockets se cerraron correctamente.");
+    escribirLog("Los sockets se cerraron correctamente.", obtenerUbicacionLlamada());
   });
-  console.log("El servidor se cerro correctamente.");
+  escribirLog("El servidor se cerro correctamente.", obtenerUbicacionLlamada());
 });
-
-function asignarImpostores(partida) {
-  const numImpostores = parseInt(partida.impostores, 10);
-  const maxJugadores = parseInt(partida.jugadores, 10);
-
-  // Crea un array con todos los jugadores posibles
-  const jugadoresPosibles = partida.jugadoresConectados;
-
-  // Baraja el array de jugadores posibles de manera aleatoria
-  const jugadoresBarajados = jugadoresPosibles.sort(() => Math.random() - 0.5);
-
-  // Asigna como impostores los primeros N jugadores barajados
-  const impostores = jugadoresBarajados.slice(0, numImpostores);
-
-  // Actualiza el estado de impostor en el array original
-  jugadoresPosibles.forEach((jugador, index) => {
-    jugador.impostor = impostores.some(
-      (impostor) => impostor.nombre === jugador.nombre
-    );
-  });
-
-  // Actualiza el array de jugadoresConectados en la partida
-  partida.jugadoresConectados = jugadoresPosibles;
-
-  return partida;
-}
-
-function generarAleatorio(maximo) {
-  // Aseguramos que maximo sea un número positivo
-  maximo = Math.abs(Math.floor(maximo));
-
-  // Generamos un número aleatorio entre 0 (inclusive) y 1 (exclusivo)
-  const numeroAleatorio = Math.random();
-
-  // Escalamos el número aleatorio al rango [0, maximo) y redondeamos
-  const numeroFinal = Math.floor(numeroAleatorio * (maximo + 1));
-
-  return numeroFinal;
-}
 
 function enviarMensajeComienzo(jugador, mensaje) {
   io.to(jugador.socket_id).emit("sendAllMessage", {
     mensaje: mensaje
   });
+}
+
+function obtenerUbicacionLlamada() {
+  // Captura la pila de llamadas para obtener información sobre el archivo y la línea
+  const stackTrace = new Error().stack.split('\n');
+  // La tercera línea contiene la información de la ubicación
+  const ubicacionLlamada = stackTrace[2].trim();
+  const regex = /at (\S+) \(([^)]+)\)/; 
+  const matchResult = regex.exec(ubicacionLlamada);
+  if (matchResult) {
+    // Extrae solo el nombre del método y la parte de la ruta del archivo y la línea
+    const [, metodo, rutaYLinea] = matchResult;
+    return metodo && rutaYLinea ? `Method: ${metodo} - ${rutaYLinea.trim()}` : 'Ubicación desconocida';
+  }
+
+  return 'Ubicación desconocida';
+}
+
+function escribirLog(mensaje, metodo) {
+  const nivel = "info";
+  // Obtener la fecha y hora actual
+  const fechaHora = new Date().toISOString();
+  // Obtener información sobre la ubicación de la llamada
+  //const ubicacionLlamada = obtenerUbicacionLlamada();
+
+  // Crear el mensaje de log con el formato deseado
+  const log = `[${nivel.toUpperCase()}] [${fechaHora}] - ${mensaje} (${metodo})`;
+
+  // Escribir en la consola
+  if (nivel === 'info') {
+    console.log(log);
+  } else if (nivel === 'warn') {
+    console.warn(log);
+  } else if (nivel === 'error') {
+    console.error(log);
+  }
 }

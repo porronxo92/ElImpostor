@@ -61,7 +61,7 @@ async function getTematicas() {
       tematicasSelect.innerHTML = "";
       data.tematicas.forEach((tematica) => {
         const option = document.createElement("option");
-        option.value = tematica.tematica;
+        option.value = tematica.id;
         option.text = tematica.tematica;
         tematicasSelect.appendChild(option);
       });
@@ -122,8 +122,7 @@ function generarPartida() {
   // Obtener los valores de los contadores y la temática seleccionada
   const numJugadores = document.getElementById("contJugador").textContent;
   const numImpostores = document.getElementById("contImpostor").textContent;
-  const tematicaSeleccionada =
-    document.getElementById("listado_tematica").value;
+  const tematicaSeleccionada = tematicasSelect.value;
   const qrelement = document.getElementById("codigoQR");
   const idPartida = Date.now();
 
@@ -203,7 +202,7 @@ iconCopy.addEventListener("click", () => {
   escribirClipboard(enlace.href);
 });
 
-iconWhatsApp.addEventListener("click", async () => {
+iconWhatsApp.addEventListener("click", () => {
   shareWhatsapp(enlace.href);
 });
 

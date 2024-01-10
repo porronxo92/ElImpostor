@@ -6,12 +6,13 @@ const tiempoMaximoEspera = 180000; // 3 minutos - 180 seg
 const textomodal = document.querySelector("#textomodal");
 let partidaCargada = null;
 
+
 // Conectar al servidor de Socket.IO
 const socket = io();
 
 // Cerrar la modal al hacer clic fuera de ella
 window.onclick = function (event) {
-  var modal = document.getElementById("modal");
+  const modal = document.getElementById("modal");
   if (event.target === modal) {
     cerrarModal();
   }
@@ -43,6 +44,26 @@ JoinButton.addEventListener("click", async () => {
     console.error("Error al realizar la acción:", error);
   }
 });
+
+function getTematica(){
+  return new Promise((resolve, reject) => {
+    const endpoint = `/getTematicaById?id=${idPartida}`;
+    fetch(endpoint)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        resolve(data.tematica);
+      })
+      .catch((error) => {
+        // Rechaza la promesa con el error si ocurre alguno
+        reject(error);
+      });
+  });
+}
 
 function obtenerValorParametro(parametro) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -79,7 +100,7 @@ function addTextoModal(mensaje) {
 async function unirsePartida(
   partidaCargada,
   jugadoresConectadosEnPartida,
-  nombreJugadorActual
+  nombreJugadorActual, tematica_cargada
 ) {
   console.log("Usuario que se unira a la partida:" + nombreJugadorActual);
   //INSERT del jugador en la BBDD
@@ -105,7 +126,7 @@ async function unirsePartida(
     //Comprobamos si la sala esta completa, si esta completa y es el jugador+1 en entrar, se envia mensaje de "sala completa"
     //Si no esta llena, mostramos los usuarios que se van conectando
     //cuando esten todos dentro de la sala, generamos aleatoriamente el impostor y el que comienza y lanzamos los mensajes a cada jugador
-    await comprobarSala(partidaCargada);
+    await comprobarSala(partidaCargada, tematica_cargada);
   } else {
     console.log(
       `La partida ${partidaCargada.id} esta llena, hay ${partidaCargada.jugadores} jugadores conectados`
@@ -119,7 +140,7 @@ async function unirsePartida(
   }, tiempoMaximoEspera);
 }
 
-async function comprobarSala(partidaCargada) {
+async function comprobarSala(partidaCargada, tematica_cargada) {
   let jugadoresConectados = await jugadoresConectadosPartida(partidaCargada.id);
   if (jugadoresConectados.length == partidaCargada.jugadores) {
     //Comprobamos que estan todos los jugadores conectados
@@ -137,9 +158,7 @@ async function comprobarSala(partidaCargada) {
 
     jugadoresConectados = await jugadoresConectadosPartida(partidaCargada.id);
     console.log(JSON.stringify(jugadoresConectados));
-    comenzarPartida(jugadoresConectados, partidaCargada);
-
-    //const socketIdSala = io.sockets.adapter.rooms.get(partidaCargada.id);
+    comenzarPartida(jugadoresConectados, tematica_cargada);
   } else {
     console.log(
       `La partida ${partidaCargada.id} aun no esta completa, faltan ${
@@ -149,9 +168,9 @@ async function comprobarSala(partidaCargada) {
   }
 }
 
-async function comenzarPartida(jugadoresConectados, partidaCargada) {
+async function comenzarPartida(jugadoresConectados, tematica_cargada) {
   //Enviamos mensaje al servidor para que comience la partida con los jugadores conectados
-  socket.emit("comenzarPartida", { jugadoresConectados, partidaCargada });
+  socket.emit("comenzarPartida", { jugadoresConectados, tematica_cargada });
 }
 
 async function asignarImpostor(jugadorImpostor) {
@@ -173,7 +192,8 @@ async function asignarImpostor(jugadorImpostor) {
         resolve(data);
       })
       .catch((error) => {
-        reject(error), console.error("Error al agregar el jugador:", error);
+        reject(error);
+        console.error("Error al agregar el jugador:", error);
       });
   });
 }
@@ -196,7 +216,8 @@ async function asignarComienzo(primerJugador) {
         resolve(data);
       })
       .catch((error) => {
-        reject(error), console.error("Error al agregar el jugador:", error);
+        reject(error);
+        console.error("Error al agregar el jugador:", error);
       });
   });
 }
@@ -222,7 +243,7 @@ async function jugadoresConectadosPartida(idPartida) {
 }
 
 function comprobarPartida(partida) {
-  if (partida == undefined) {
+  if (partida === undefined) {
     return false;
   }
   return true;
@@ -239,9 +260,10 @@ async function joinGameBBDD() {
     console.log("Usuario que se unira a la partida: " + nombreJugadorActual);
     //Primero cargamos la partida
     partidaCargada = await getPartida();
+    const tematica_cargada = await getTematica();
     partidaCargada.forEach((partida) => {
       console.log(
-        `Partida cargada --> ID: ${partida.id}, Jugadores: ${partida.jugadores}, Impostores: ${partida.impostores}, Tematica: ${partida.tematica}`
+        `Partida cargada --> ID: ${partida.id}, Jugadores: ${partida.jugadores}, Impostores: ${partida.impostores}, Tematica: ${tematica_cargada}}`
       );
     });
     if (!comprobarPartida(partidaCargada[0])) {
@@ -268,7 +290,8 @@ async function joinGameBBDD() {
       unirsePartida(
         partidaCargada[0],
         jugadoresConectados,
-        nombreJugadorActual
+        nombreJugadorActual, 
+        tematica_cargada
       );
       JoinButton.disabled = false;
     }
@@ -291,7 +314,8 @@ async function insertJugador(jugador) {
         resolve(data);
       })
       .catch((error) => {
-        reject(error), console.error("Error al agregar el jugador:", error);
+        reject(error);
+        console.error("Error al agregar el jugador:", error);
       });
   });
 }
