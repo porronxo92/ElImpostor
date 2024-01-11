@@ -39,7 +39,6 @@ JoinButton.addEventListener("click", async () => {
   try {
     // Realizar la acción o solicitud aquí
     await joinGameBBDD();
-    console.log("Acción completada exitosamente");
   } catch (error) {
     console.error("Error al realizar la acción:", error);
   }
@@ -118,7 +117,6 @@ async function unirsePartida(
       socket_id: "",
       es_primero: false,
     };
-    console.log(await insertJugador(nuevoJugador));
 
     //Añadimos el jugador a la room con id_partida del socket y recibimos el socket_id
     socket.emit("unirsePartida", { nuevoJugador });
@@ -153,15 +151,14 @@ async function comprobarSala(partidaCargada, tematica_cargada) {
       asignarImpostor(jugadoresConectados[numAleatorioImpostor]),
       asignarComienzo(jugadoresConectados[numAleatorioComenzar]),
     ]);
-    console.log(`Impostor y primer jugador asignados`);
     addTextoModal(`Impostor y primer jugador asignados`);
 
     jugadoresConectados = await jugadoresConectadosPartida(partidaCargada.id);
-    console.log(JSON.stringify(jugadoresConectados));
+    
     comenzarPartida(jugadoresConectados, tematica_cargada);
   } else {
-    console.log(
-      `La partida ${partidaCargada.id} aun no esta completa, faltan ${
+    addTextoModal(
+      `La partida aun no esta completa, faltan ${
         partidaCargada.jugadores - jugadoresConectados.length
       } jugador(es) para empezar`
     );
@@ -275,7 +272,7 @@ async function joinGameBBDD() {
         partidaCargada[0].id
       );
       console.log(
-        `Hay ${jugadoresConectados.length} jugadores conectados a la partida ${partidaCargada[0].id}`
+        `Hay ${jugadoresConectados.length} jugadores conectados a la partida`
       );
       jugadoresConectados.forEach((jugador, indice) => {
         console.log(
@@ -284,7 +281,7 @@ async function joinGameBBDD() {
           }`
         );
       });
-      console.log(`Conectandose a la partida ${partidaCargada[0].id}...`);
+      console.log(`Conectandose a la partida...`);
 
       //Cuando tenemos la partida, conectamos al jugador actual a la partida en curso
       unirsePartida(
@@ -384,7 +381,7 @@ async function jugadorUnido(nuevoJugador) {
 
   console.log(
     `Lista de jugadores conectados a la partida:${jugadoresConectados.map(
-      (jugador) => `- ${jugador.nombre}`
+      (jugador) => ` ${jugador.nombre}`
     )}`
   );
   textomodal.innerHTML = `Cuando la sala se complete comenzamos:<br>
@@ -399,7 +396,6 @@ async function jugadorUnido(nuevoJugador) {
 // Escuchar el evento "comenzarPartida"
 socket.on("sendAllMessage", (data) => {
   // Aquí puedes manejar la información recibida del servidor
-  console.log(data.mensaje);
   textomodal.innerHTML = `${data.mensaje}`;
   mostrarSpinner(false);
 });
