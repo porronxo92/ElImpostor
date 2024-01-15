@@ -233,6 +233,7 @@ io.on("connection", (socket) => {
       );     
   });
 
+  //Evento que comienza la partida
   socket.on("comenzarPartida", ({ jugadoresConectados, tematica_cargada }) => {
     utils.escribirLog("Comenzar partida ")
     jugadoresConectados.forEach((jugadorConectado) => { 
@@ -243,6 +244,7 @@ io.on("connection", (socket) => {
     });
   });
 });
+
 
 // Metodos server
 server.listen(port, () => {
